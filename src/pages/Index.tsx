@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FileUploadZone } from "@/components/FileUploadZone";
 import { OCRProcessor } from "@/components/OCRProcessor";
 import { Card } from "@/components/ui/card";
 import { FileText, Zap, Download } from "lucide-react";
+import { registerServiceWorker, checkInstallPrompt, showIOSInstallInstructions, setupOfflineDetection } from "@/utils/pwa";
 
 const Index = () => {
   const [files, setFiles] = useState<File[]>([]);
+
+  useEffect(() => {
+    // Initialize PWA features
+    registerServiceWorker();
+    checkInstallPrompt();
+    showIOSInstallInstructions();
+    setupOfflineDetection();
+  }, []);
 
   const handleFileUpload = (newFiles: File[]) => {
     setFiles(prev => [...prev, ...newFiles]);
