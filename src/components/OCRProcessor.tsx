@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import Tesseract from 'tesseract.js';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 
 interface OCRResult {
   text: string;
@@ -155,6 +156,114 @@ export const OCRProcessor: React.FC<OCRProcessorProps> = ({ files, onClearFiles 
     });
   };
 
+  const exportToWord = async () => {
+    const paragraphs: Paragraph[] = [];
+    
+    results.forEach((result, index) => {
+      // Add file name as heading
+      paragraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Dosya: ${result.fileName}`,
+              bold: true,
+              size: 32,
+            }),
+          ],
+          heading: HeadingLevel.HEADING_2,
+          spacing: { after: 200 },
+        })
+      );
+      
+      // Add confidence score
+      paragraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Güven Skoru: ${result.confidence.toFixed(1)}%`,
+              italics: true,
+              size: 24,
+            }),
+          ],
+          spacing: { after: 200 },
+        })
+      );
+      
+      // Add OCR text
+      paragraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: result.text,
+              size: 22,
+            }),
+          ],
+          spacing: { after: 400 },
+        })
+      );
+      
+      // Add separator if not last item
+      if (index < results.length - 1) {
+        paragraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "────────────────────────────────────────",
+                color: "CCCCCC",
+              }),
+            ],
+            spacing: { after: 400 },
+          })
+        );
+      }
+    });
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "IŞIL OCR Sonuçları",
+                  bold: true,
+                  size: 48,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+              spacing: { after: 400 },
+            }),
+            ...paragraphs,
+          ],
+        },
+      ],
+    });
+
+    try {
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'IŞIL_OCR_Sonuçları.docx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Word Dosyası İndirildi",
+        description: "OCR sonuçları Word formatında kaydedildi.",
+      });
+    } catch (error) {
+      toast({
+        title: "Hata",
+        description: "Word dosyası oluşturulamadı.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const combinedText = results.map(result => result.text).join('\n\n');
 
   return (
@@ -221,6 +330,14 @@ export const OCRProcessor: React.FC<OCRProcessorProps> = ({ files, onClearFiles 
               >
                 <FileDown className="w-4 h-4" />
                 PDF
+              </Button>
+              <Button
+                onClick={exportToWord}
+                variant="outline"
+                size="sm"
+              >
+                <FileDown className="w-4 h-4" />
+                Word
               </Button>
             </div>
           </div>
