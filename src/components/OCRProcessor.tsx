@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { FileDown, Copy, Check } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+// Temporarily disabled toast to fix React hooks error
+// import { toast } from "@/hooks/use-toast";
 import Tesseract from 'tesseract.js';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -63,18 +64,12 @@ export const OCRProcessor: React.FC<OCRProcessorProps> = ({ files, onClearFiles 
       }
       
       setResults(newResults);
-      toast({
-        title: "OCR Tamamlandı",
-        description: `${files.length} dosya başarıyla işlendi.`,
-        variant: "default",
-      });
+      // Temporarily disabled toast notifications
+      console.log("OCR Tamamlandı:", `${files.length} dosya başarıyla işlendi.`);
     } catch (error) {
       console.error('OCR Error:', error);
-      toast({
-        title: "Hata",
-        description: "OCR işlemi sırasında bir hata oluştu.",
-        variant: "destructive",
-      });
+      // Temporarily disabled toast notifications
+      console.log("Hata: OCR işlemi sırasında bir hata oluştu.");
     } finally {
       setIsProcessing(false);
       setProgress(0);
@@ -91,16 +86,11 @@ export const OCRProcessor: React.FC<OCRProcessorProps> = ({ files, onClearFiles 
       await navigator.clipboard.writeText(allText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast({
-        title: "Kopyalandı",
-        description: "Metin panoya kopyalandı.",
-      });
+      // Temporarily disabled toast notifications
+      console.log("Kopyalandı: Metin panoya kopyalandı.");
     } catch (error) {
-      toast({
-        title: "Hata",
-        description: "Metin kopyalanamadı.",
-        variant: "destructive",
-      });
+      // Temporarily disabled toast notifications
+      console.log("Hata: Metin kopyalanamadı.");
     }
   };
 
@@ -116,10 +106,8 @@ export const OCRProcessor: React.FC<OCRProcessorProps> = ({ files, onClearFiles 
     XLSX.utils.book_append_sheet(wb, ws, 'OCR Sonuçları');
     XLSX.writeFile(wb, 'IŞIL_OCR_Sonuçları.xlsx');
     
-    toast({
-      title: "Excel Dosyası İndirildi",
-      description: "OCR sonuçları Excel formatında kaydedildi.",
-    });
+    // Temporarily disabled toast notifications
+    console.log("Excel Dosyası İndirildi: OCR sonuçları Excel formatında kaydedildi.");
   };
 
   const exportToPDF = () => {
@@ -150,10 +138,8 @@ export const OCRProcessor: React.FC<OCRProcessorProps> = ({ files, onClearFiles 
     
     pdf.save('IŞIL_OCR_Sonuçları.pdf');
     
-    toast({
-      title: "PDF Dosyası İndirildi",
-      description: "OCR sonuçları PDF formatında kaydedildi.",
-    });
+    // Temporarily disabled toast notifications
+    console.log("PDF Dosyası İndirildi: OCR sonuçları PDF formatında kaydedildi.");
   };
 
   const exportToWord = async () => {
@@ -251,16 +237,11 @@ export const OCRProcessor: React.FC<OCRProcessorProps> = ({ files, onClearFiles 
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      toast({
-        title: "Word Dosyası İndirildi",
-        description: "OCR sonuçları Word formatında kaydedildi.",
-      });
+      // Temporarily disabled toast notifications
+      console.log("Word Dosyası İndirildi: OCR sonuçları Word formatında kaydedildi.");
     } catch (error) {
-      toast({
-        title: "Hata",
-        description: "Word dosyası oluşturulamadı.",
-        variant: "destructive",
-      });
+      // Temporarily disabled toast notifications
+      console.log("Hata: Word dosyası oluşturulamadı.");
     }
   };
 
